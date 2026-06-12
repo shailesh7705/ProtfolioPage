@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Shailesh Kumaar — Computer Science Engineer, Full Stack Developer & Software Developer. Explore my portfolio featuring innovative projects, cutting-edge skills, and a passion for building exceptional digital experiences.">
+    <meta name="keywords" content="Shailesh, Shailesh Kumaar, Portfolio, Full Stack Developer, Computer Science, Web Developer, React, Python, Java, Software Developer">
+    <meta name="author" content="Shailesh Kumaar">
+    <meta name="theme-color" content="#050510">
+    <meta property="og:title" content="Shailesh Kumaar — Developer Portfolio">
+    <meta property="og:description" content="Computer Science Engineer | Full Stack Developer | Problem Solver">
+    <meta property="og:type" content="website">
+    <meta name="robots" content="index, follow">
+    <title>Shailesh Kumaar — Developer Portfolio</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- ========================================== -->
+    <!-- CINEMATIC INTRO OVERLAY                    -->
+    <!-- ========================================== -->
+    <div class="intro-overlay" id="intro-overlay">
+        <div class="intro-content">
+            <div class="intro-logo" id="intro-logo">S</div>
+            <div class="intro-text" id="intro-text">Loading Experience...</div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- SCROLL PROGRESS BAR (created by JS)        -->
+    <!-- ========================================== -->
+
+    <!-- ========================================== -->
+    <!-- NAVIGATION                                 -->
+    <!-- ========================================== -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="#hero" class="nav-logo">
+                <span class="nav-logo-icon">S</span>
+                <span class="nav-logo-text">Shailesh Kumaar</span>
+            </a>
+
+            <div class="nav-links" id="nav-links">
+                <a href="#about" class="nav-link">About</a>
+                <a href="#skills" class="nav-link">Skills</a>
+                <a href="#projects" class="nav-link">Projects</a>
+                <a href="#experience" class="nav-link">Experience</a>
+                <a href="#achievements" class="nav-link">Achievements</a>
+                <a href="#contact" class="nav-link nav-cta">Contact</a>
+            </div>
+
+            <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- ========================================== -->
+    <!-- HERO SECTION                               -->
+    <!-- ========================================== -->
+    <section id="hero" class="hero-section">
+        <div id="hero-canvas" class="hero-canvas"></div>
+
+        <div class="hero-content">
+            <div class="hero-badge reveal-scale">
+                <span class="badge-dot"></span>
+                Available for Opportunities
+            </div>
+
+            <h1 class="hero-title reveal">
+                Hi, I'm <span class="gradient-text">Shailesh Kumaar</span>
+            </h1>
+
+            <p class="hero-subtitle" id="hero-subtitle">
+                <span class="typing-text"></span>
+                <span class="typing-cursor">|</span>
+            </p>
+
+            <div class="hero-buttons reveal">
+                <a href="#projects" class="btn btn-primary">
+                    <span class="btn-icon">🚀</span>
+                    View Projects
+                </a>
+                <a href="#contact" class="btn btn-secondary">
+                    <span class="btn-icon">💬</span>
+                    Contact Me
+                </a>
+            </div>
+        </div>
+
+        <div class="scroll-indicator" id="scroll-indicator">
+            <div class="scroll-mouse">
+                <div class="scroll-wheel"></div>
+            </div>
+            <span class="scroll-text">Scroll to Explore</span>
+        </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- ABOUT SECTION                              -->
+    <!-- ========================================== -->
+    <section id="about" class="section">
+        <div class="container">
+            <div class="section-header reveal">
+                <span class="section-label">About Me</span>
+                <h2 class="section-title">Crafting Digital <span class="gradient-text">Experiences</span></h2>
+                <p class="section-subtitle">Passionate about building innovative solutions that make a difference</p>
+            </div>
+
+            <div class="about-grid">
+                <div class="about-card reveal-left">
+                    <div class="about-card-inner">
+                        <h3 class="about-heading">My Journey</h3>
+                        <div class="about-text">
+                            <p>I'm a Computer Science Engineering student with a deep passion for technology and innovation. My journey in software development started with curiosity and has grown into a relentless pursuit of building exceptional digital experiences.</p>
+                            <p>From designing intuitive user interfaces to architecting robust backend systems, I thrive on solving complex problems and turning ideas into reality. I believe in writing clean, efficient code that not only works but inspires.</p>
+                        </div>
+                        <div class="about-tags">
+                            <span class="about-tag">
+                                <span class="tag-icon">🎓</span> CSE Student
+                            </span>
+                            <span class="about-tag">
+                                <span class="tag-icon">🌐</span> Web Development
+                            </span>
+                            <span class="about-tag">
+                                <span class="tag-icon">🐍</span> Python
+                            </span>
+                            <span class="about-tag">
+                                <span class="tag-icon">☕</span> Java
+                            </span>
+                            <span class="about-tag">
+                                <span class="tag-icon">🗄️</span> SQL
+                            </span>
+                            <span class="about-tag">
+                                <span class="tag-icon">🧩</span> Problem Solving
+                            </span>
+                            <span class="about-tag">
+                                <span class="tag-icon">💻</span> Software Engineering
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="about-visual reveal-right">
+                    <div class="stat-card">
+                        <div class="stat-icon">📊</div>
+                        <div class="stat-number gradient-text">3+</div>
+                        <div class="stat-label">Years Coding</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">💻</div>
+                        <div class="stat-number gradient-text">10+</div>
+                        <div class="stat-label">Projects Built</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🏆</div>
+                        <div class="stat-number gradient-text">8+</div>
+                        <div class="stat-label">Technologies</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🎯</div>
+                        <div class="stat-number gradient-text">100%</div>
+                        <div class="stat-label">Dedication</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- SKILLS SECTION                             -->
+    <!-- ========================================== -->
+    <section id="skills" class="section section-alt">
+        <div class="container">
+            <div class="section-header reveal">
+                <span class="section-label">Skills & Expertise</span>
+                <h2 class="section-title">Technologies I <span class="gradient-text">Master</span></h2>
+                <p class="section-subtitle">Constantly evolving my technical toolkit to stay ahead of the curve</p>
+            </div>
+
+            <div class="skills-container">
+                <div class="skill-sphere reveal" style="--delay: 0.05s">
+                    <div class="skill-icon">📄</div>
+                    <div class="skill-name">HTML</div>
+                    <div class="skill-level">
+                        <div class="skill-level-fill" data-width="95"></div>
+                    </div>
+                    <div class="skill-percentage">95%</div>
+                </div>
+
+                <div class="skill-sphere reveal" style="--delay: 0.1s">
+                    <div class="skill-icon">🎨</div>
+                    <div class="skill-name">CSS</div>
+                    <div class="skill-level">
+                        <div class="skill-level-fill" data-width="90"></div>
+                    </div>
+                    <div class="skill-percentage">90%</div>
+                </div>
+
+                <div class="skill-sphere reveal" style="--delay: 0.15s">
+                    <div class="skill-icon">⚡</div>
+                    <div class="skill-name">JavaScript</div>
+                    <div class="skill-level">
+                        <div class="skill-level-fill" data-width="85"></div>
+                    </div>
+                    <div class="skill-percentage">85%</div>
+                </div>
+
+                <div class="skill-sphere reveal" style="--delay: 0.2s">
+                    <div class="skill-icon">⚛️</div>
+                    <div class="skill-name">React</div>
+                    <div class="skill-level">
+                        <div class="skill-level-fill" data-width="80"></div>
+                    </div>
+                    <div class="skill-percentage">80%</div>
+                </div>
+
+                <div class="skill-sphere reveal" style="--delay: 0.25s">
+                    <div class="skill-icon">🐍</div>
+                    <div class="skill-name">Python</div>
+                    <div class="skill-level">
+                        <div class="skill-level-fill" data-width="88"></div>
+                    </div>
+                    <div class="skill-percentage">88%</div>
+                </div>
+
+                <div class="skill-sphere reveal" style="--delay: 0.3s">
+                    <div class="skill-icon">☕</div>
+                    <div class="skill-name">Java</div>
+                    <div class="skill-level">
+                        <div class="skill-level-fill" data-width="82"></div>
+                    </div>
+                    <div class="skill-percentage">82%</div>
+                </div>
+
+                <div class="skill-sphere reveal" style="--delay: 0.35s">
+                    <div class="skill-icon">🗄️</div>
+                    <div class="skill-name">MySQL</div>
+                    <div class="skill-level">
+                        <div class="skill-level-fill" data-width="78"></div>
+                    </div>
+                    <div class="skill-percentage">78%</div>
+                </div>
+
+                <div class="skill-sphere reveal" style="--delay: 0.4s">
+                    <div class="skill-icon">🔀</div>
+                    <div class="skill-name">Git</div>
+                    <div class="skill-level">
+                        <div class="skill-level-fill" data-width="85"></div>
+                    </div>
+                    <div class="skill-percentage">85%</div>
+                </div>
+
+                <div class="skill-sphere reveal" style="--delay: 0.45s">
+                    <div class="skill-icon">🐙</div>
+                    <div class="skill-name">GitHub</div>
+                    <div class="skill-level">
+                        <div class="skill-level-fill" data-width="88"></div>
+                    </div>
+                    <div class="skill-percentage">88%</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- PROJECTS SECTION                           -->
+    <!-- ========================================== -->
+    <section id="projects" class="section">
+        <div class="container">
+            <div class="section-header reveal">
+                <span class="section-label">Featured Work</span>
+                <h2 class="section-title">Projects That <span class="gradient-text">Define</span> Me</h2>
+                <p class="section-subtitle">Each project is a journey of innovation, problem-solving, and creative engineering</p>
+            </div>
+
+            <div class="projects-grid">
+                <!-- Project 1 -->
+                <div class="project-card reveal">
+                    <div class="project-image">
+                        <div class="project-image-placeholder">
+                            <span class="project-emoji">♻️</span>
+                        </div>
+                        <div class="project-overlay"></div>
+                    </div>
+                    <div class="project-content">
+                        <div class="project-category">Computer Vision & IoT</div>
+                        <h3 class="project-title">Smart Waste Segregation Assistant</h3>
+                        <p class="project-description">An assistive waste identification system for visually impaired students. Features a MobileNetV2 image classifier trained on a custom dataset of 1,200+ waste images. Integrates with Raspberry Pi for audio/tactile feedback.</p>
+                        <div class="project-tech">
+                            <span class="tech-tag">Python</span>
+                            <span class="tech-tag">MobileNetV2</span>
+                            <span class="tech-tag">Raspberry Pi</span>
+                            <span class="tech-tag">Edge AI</span>
+                            <span class="tech-tag">Dataset Preparation</span>
+                        </div>
+                        <div class="project-links">
+                            <a href="#" class="project-link project-link-primary">
+                                <span>🔗</span> Live Demo
+                            </a>
+                            <a href="https://github.com/shailesh7705" target="_blank" rel="noopener noreferrer" class="project-link project-link-secondary">
+                                <span>📁</span> GitHub
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project 2 -->
+                <div class="project-card reveal">
+                    <div class="project-image">
+                        <div class="project-image-placeholder project-image-placeholder-2">
+                            <span class="project-emoji">🌍</span>
+                        </div>
+                        <div class="project-overlay"></div>
+                    </div>
+                    <div class="project-content">
+                        <div class="project-category">Web Application</div>
+                        <h3 class="project-title">Tourism Management Portal</h3>
+                        <p class="project-description">A comprehensive full-stack tourism management application. Features automated booking flows, structured user profiles, and a robust, integrated admin dashboard for site-wide tour and package control.</p>
+                        <div class="project-tech">
+                            <span class="tech-tag">PHP</span>
+                            <span class="tech-tag">MySQL</span>
+                            <span class="tech-tag">HTML</span>
+                            <span class="tech-tag">CSS</span>
+                            <span class="tech-tag">JavaScript</span>
+                        </div>
+                        <div class="project-links">
+                            <a href="#" class="project-link project-link-primary">
+                                <span>🔗</span> Live Demo
+                            </a>
+                            <a href="https://github.com/shailesh7705" target="_blank" rel="noopener noreferrer" class="project-link project-link-secondary">
+                                <span>📁</span> GitHub
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project 3 -->
+                <div class="project-card reveal">
+                    <div class="project-image">
+                        <div class="project-image-placeholder project-image-placeholder-3">
+                            <span class="project-emoji">📊</span>
+                        </div>
+                        <div class="project-overlay"></div>
+                    </div>
+                    <div class="project-content">
+                        <div class="project-category">Frontend Application</div>
+                        <h3 class="project-title">CGPA Calculator & Task Manager</h3>
+                        <p class="project-description">A responsive utility application built for academic success. Helps students easily compute subject GPAs and cumulative performance metrics, alongside a task organizer for managing daily goals and deadlines.</p>
+                        <div class="project-tech">
+                            <span class="tech-tag">HTML</span>
+                            <span class="tech-tag">CSS</span>
+                            <span class="tech-tag">JavaScript</span>
+                            <span class="tech-tag">Web Storage</span>
+                        </div>
+                        <div class="project-links">
+                            <a href="#" class="project-link project-link-primary">
+                                <span>🔗</span> Live Demo
+                            </a>
+                            <a href="https://github.com/shailesh7705" target="_blank" rel="noopener noreferrer" class="project-link project-link-secondary">
+                                <span>📁</span> GitHub
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project 4 -->
+                <div class="project-card reveal">
+                    <div class="project-image">
+                        <div class="project-image-placeholder project-image-placeholder-4">
+                            <span class="project-emoji">🧩</span>
+                        </div>
+                        <div class="project-overlay"></div>
+                    </div>
+                    <div class="project-content">
+                        <div class="project-category">Problem Solving</div>
+                        <h3 class="project-title">Algorithms & Problem Solving</h3>
+                        <p class="project-description">A repository dedicated to competitive programming and algorithmic training. Contains optimized solutions to 400+ problems on LeetCode spanning advanced structures, logic, and complexity optimization.</p>
+                        <div class="project-tech">
+                            <span class="tech-tag">Data Structures</span>
+                            <span class="tech-tag">Algorithms</span>
+                            <span class="tech-tag">SQL</span>
+                            <span class="tech-tag">Python</span>
+                            <span class="tech-tag">Java</span>
+                        </div>
+                        <div class="project-links">
+                            <a href="https://leetcode.com/" target="_blank" rel="noopener noreferrer" class="project-link project-link-primary">
+                                <span>🔗</span> LeetCode Profile
+                            </a>
+                            <a href="https://github.com/shailesh7705" target="_blank" rel="noopener noreferrer" class="project-link project-link-secondary">
+                                <span>📁</span> GitHub Repository
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- EXPERIENCE & EDUCATION SECTION             -->
+    <!-- ========================================== -->
+    <section id="experience" class="section section-alt">
+        <div class="container">
+            <div class="section-header reveal">
+                <span class="section-label">Journey</span>
+                <h2 class="section-title">Experience & <span class="gradient-text">Education</span></h2>
+                <p class="section-subtitle">A roadmap of growth, learning, and continuous evolution</p>
+            </div>
+
+            <div class="timeline">
+                <div class="timeline-line"></div>
+
+                <div class="timeline-item timeline-left reveal-left">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-date">2022 — 2026 (Expected)</div>
+                        <h3 class="timeline-title">B.E. Computer Science & Engineering</h3>
+                        <p class="timeline-institution">Sathyabama Institute of Science and Technology — Chennai</p>
+                        <p class="timeline-description">Acquiring a deep academic foundation in software engineering, programming methodologies, databases, and core system architectures. Maintaining solid performance with a CGPA of 8.01.</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item timeline-right reveal-right">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-date">2023 — Present</div>
+                        <h3 class="timeline-title">Practical Project Development</h3>
+                        <p class="timeline-institution">Academic & Research Projects</p>
+                        <p class="timeline-description">Created practical systems like the Smart Waste Segregation Assistant utilizing MobileNetV2 image classification models. Built full-stack responsive web systems using PHP, MySQL, and modern JavaScript.</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item timeline-left reveal-left">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-date">2023 — Present</div>
+                        <h3 class="timeline-title">Problem Solving & Coding Practice</h3>
+                        <p class="timeline-institution">LeetCode & Competitive Logic</p>
+                        <p class="timeline-description">Solved 400+ problems on LeetCode focusing on Data Structures and Algorithms, SQL queries, arrays, trees, and logic building. Continually optimizing code for speed and performance.</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item timeline-right reveal-right">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-date">Ongoing</div>
+                        <h3 class="timeline-title">Industry Certifications</h3>
+                        <p class="timeline-institution">Self-Directed Learning</p>
+                        <p class="timeline-description">Earning professional credentials including NPTEL (DSA with Python, Database Management System, Programming in Java), IBM (AI Fundamentals), COGNIBOT (Machine Learning), and Simplelearn (JavaScript).</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- ACHIEVEMENTS SECTION                       -->
+    <!-- ========================================== -->
+    <section id="achievements" class="section">
+        <div class="container">
+            <div class="section-header reveal">
+                <span class="section-label">Milestones</span>
+                <h2 class="section-title">Achievements & <span class="gradient-text">Numbers</span></h2>
+                <p class="section-subtitle">Key metrics that reflect my dedication and growth</p>
+            </div>
+
+            <div class="achievements-grid">
+                <div class="achievement-card reveal">
+                    <div class="achievement-icon">🚀</div>
+                    <div class="achievement-number gradient-text">
+                        <span class="counter" data-target="10">0</span>+
+                    </div>
+                    <div class="achievement-label">Projects Completed</div>
+                    <div class="achievement-bar"></div>
+                </div>
+
+                <div class="achievement-card reveal">
+                    <div class="achievement-icon">💡</div>
+                    <div class="achievement-number gradient-text">
+                        <span class="counter" data-target="8">0</span>+
+                    </div>
+                    <div class="achievement-label">Technologies Learned</div>
+                    <div class="achievement-bar"></div>
+                </div>
+
+                <div class="achievement-card reveal">
+                    <div class="achievement-icon">🧩</div>
+                    <div class="achievement-number gradient-text">
+                        <span class="counter" data-target="400">0</span>+
+                    </div>
+                    <div class="achievement-label">Coding Problems Solved</div>
+                    <div class="achievement-bar"></div>
+                </div>
+
+                <div class="achievement-card reveal">
+                    <div class="achievement-icon">📜</div>
+                    <div class="achievement-number gradient-text">
+                        <span class="counter" data-target="6">0</span>+
+                    </div>
+                    <div class="achievement-label">Certifications Earned</div>
+                    <div class="achievement-bar"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- CONTACT SECTION                            -->
+    <!-- ========================================== -->
+    <section id="contact" class="section section-alt">
+        <div class="container">
+            <div class="section-header reveal">
+                <span class="section-label">Get In Touch</span>
+                <h2 class="section-title">Let's Build Something <span class="gradient-text">Amazing</span></h2>
+                <p class="section-subtitle">I'm always open to discussing new projects, creative ideas, or opportunities to be part of your vision</p>
+            </div>
+
+            <div class="contact-card reveal-scale">
+                <div class="contact-card-glow"></div>
+                <div class="contact-card-inner">
+                    <div class="contact-info">
+                        <h3 class="contact-title">Ready to Connect?</h3>
+                        <p class="contact-text">Whether you have a project in mind, want to collaborate, or just want to say hello — I'd love to hear from you. Let's create something exceptional together.</p>
+                    </div>
+
+                    <div class="contact-links">
+                        <a href="mailto:shaileshkumaar4455@gmail.com" class="contact-link" id="contact-email">
+                            <div class="contact-link-icon">📧</div>
+                            <div class="contact-link-info">
+                                <span class="contact-link-label">Email</span>
+                                <span class="contact-link-value">shaileshkumaar4455@gmail.com</span>
+                            </div>
+                            <div class="contact-link-arrow">→</div>
+                        </a>
+
+                        <a href="https://www.linkedin.com/in/shailesh-kumaar2707/" target="_blank" rel="noopener noreferrer" class="contact-link" id="contact-linkedin">
+                            <div class="contact-link-icon">💼</div>
+                            <div class="contact-link-info">
+                                <span class="contact-link-label">LinkedIn</span>
+                                <span class="contact-link-value">linkedin.com/in/shailesh-kumaar2707</span>
+                            </div>
+                            <div class="contact-link-arrow">→</div>
+                        </a>
+
+                        <a href="https://github.com/shailesh7705" target="_blank" rel="noopener noreferrer" class="contact-link" id="contact-github">
+                            <div class="contact-link-icon">🐙</div>
+                            <div class="contact-link-info">
+                                <span class="contact-link-label">GitHub</span>
+                                <span class="contact-link-value">github.com/shailesh7705</span>
+                            </div>
+                            <div class="contact-link-arrow">→</div>
+                        </a>
+                    </div>
+
+                    <a href="resume.pdf" download="Shailesh_Kumaar_Resume.pdf" class="resume-btn" id="resume-download">
+                        <span class="resume-btn-icon">📄</span>
+                        <span class="resume-btn-text">Download Resume</span>
+                        <span class="resume-btn-arrow">↓</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- FOOTER                                     -->
+    <!-- ========================================== -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-inner">
+                <div class="footer-brand">
+                    <span class="footer-logo">S</span>
+                    <span class="footer-name">Shailesh Kumaar</span>
+                </div>
+                <p class="footer-text">Designed & Built with 💜 by Shailesh Kumaar &copy; 2026</p>
+                <div class="footer-links">
+                    <a href="https://github.com/shailesh7705" target="_blank" rel="noopener noreferrer" class="footer-link">GitHub</a>
+                    <a href="https://www.linkedin.com/in/shailesh-kumaar2707/" target="_blank" rel="noopener noreferrer" class="footer-link">LinkedIn</a>
+                    <a href="mailto:shaileshkumaar4455@gmail.com" class="footer-link">Email</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ========================================== -->
+    <!-- SCRIPTS                                    -->
+    <!-- ========================================== -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="script.js"></script>
+
+</body>
+</html>
