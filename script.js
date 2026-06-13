@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
     },
 
     // Particles
-    particleCount: 2000,
+    particleCount: window.innerWidth < 768 ? 800 : 2000,
     particleSphereRadius: 50,
     particleSizeMin: 0.08,
     particleSizeMax: 0.15,
@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
     cameraMaxOffset: 2,
 
     // Geometric objects
-    geoCount: 10,
+    geoCount: window.innerWidth < 768 ? 5 : 10,
     geoSpreadX: 15,
     geoSpreadY: 10,
     geoSpreadZ: { min: -10, max: 5 },
