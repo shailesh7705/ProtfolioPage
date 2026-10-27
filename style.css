@@ -436,6 +436,83 @@ button {
   text-align: center;
 }
 
+/* Hero Brand Avatar Icon */
+.hero-brand-icon {
+  position: relative;
+  width: 76px;
+  height: 76px;
+  margin: 0 auto 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.brand-icon-halo {
+  position: absolute;
+  inset: -12px;
+  border-radius: 28px;
+  background: radial-gradient(circle, rgba(0, 245, 212, 0.45) 0%, rgba(139, 92, 246, 0.25) 50%, transparent 75%);
+  filter: blur(12px);
+  animation: halo-pulse 3s infinite ease-in-out;
+  pointer-events: none;
+}
+
+@keyframes halo-pulse {
+  0%, 100% { opacity: 0.6; transform: scale(0.95); }
+  50% { opacity: 1; transform: scale(1.1); }
+}
+
+.brand-icon-box {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  border-radius: 22px;
+  background: #0b0f19;
+  border: 2px solid transparent;
+  background-image: linear-gradient(#0b0f19, #0b0f19), linear-gradient(135deg, #00f5d4, #00d4ff, #8b5cf6);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 25px rgba(0, 245, 212, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: float-icon 4s ease-in-out infinite;
+  transition: transform var(--transition-smooth), box-shadow var(--transition-smooth);
+  cursor: pointer;
+}
+
+.brand-icon-box:hover {
+  transform: translateY(-4px) scale(1.06);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7), 0 0 35px rgba(0, 212, 255, 0.5);
+}
+
+@keyframes float-icon {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-7px); }
+}
+
+.brand-icon-letter {
+  font-family: var(--font-display);
+  font-size: 2.2rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #00f5d4, #00d4ff, #8b5cf6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  line-height: 1;
+}
+
+.brand-icon-status {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--accent-green);
+  border: 3px solid #030712;
+  box-shadow: 0 0 8px var(--accent-green);
+}
+
 .hero-badge {
   display: inline-flex;
   align-items: center;
