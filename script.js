@@ -1,1044 +1,844 @@
 // ============================================================================
-//  SHAILESH PORTFOLIO — Premium 3D Interactive Experience
-//  Three.js r128 · Vanilla JS · Zero Dependencies
+// SHAILESH KUMAAR — PORTFOLIO ENGINE
+// Top 1% Developer Architecture · Command Palette · Terminal · 3D Canvas
+// Zero Dependencies (Pure Vanilla JS + Three.js for Hero)
 // ============================================================================
 
 document.addEventListener('DOMContentLoaded', () => {
   'use strict';
 
   // ==========================================================================
-  // 1. CONFIGURATION & CONSTANTS
+  // 1. CONFIGURATION & STATE
   // ==========================================================================
-
   const CONFIG = {
-    // Colors
-    colors: {
-      cyan:   0x00d4ff,
-      purple: 0x7b61ff,
-      mint:   0x00f5d4,
-      pink:   0xff6b9d,
-      white:  0xffffff,
-    },
-
-    // Particles
-    particleCount: window.innerWidth < 768 ? 800 : 2000,
-    particleSphereRadius: 50,
-    particleSizeMin: 0.08,
-    particleSizeMax: 0.15,
-    particleRotationSpeed: 0.0002,
-
-    // Camera
-    cameraZ: 30,
-    cameraParallaxFactor: 0.05,
-    cameraMaxOffset: 2,
-
-    // Geometric objects
-    geoCount: window.innerWidth < 768 ? 5 : 10,
-    geoSpreadX: 15,
-    geoSpreadY: 10,
-    geoSpreadZ: { min: -10, max: 5 },
-
-    // Tilt cards
-    tiltMax: 10,
-    tiltPerspective: 1000,
-
-    // Typing effect
+    email: 'shaileshkumaar4455@gmail.com',
     typingStrings: [
-      'Computer Science Engineer',
-      'Full Stack Developer',
-      'Problem Solver',
-      'Software Developer',
+      'Computer Science Engineer @ Sathyabama (CGPA 8.11)',
+      '427 LeetCode Solved (277 Easy · 138 Med · 12 Hard)',
+      'Full-Stack Developer (PHP & MySQL)',
+      'Final Year Project: Smart Waste Assistant',
     ],
-    typingSpeed: 80,
-    deletingSpeed: 40,
-    pauseAfterType: 1800,
-    pauseAfterDelete: 500,
-
-    // Counter animation
-    counterDuration: 2000,
-
-    // Scroll / nav
-    navbarHeight: 80,
-    navScrollThreshold: 50,
-
-    // Intro
-    introDuration: 2500,
-
-    // Custom cursor
-    cursorDotSize: 8,
-    cursorRingSize: 40,
-    cursorLerpFactor: 0.15,
-    cursorMinWidth: 1024,
-
-    // Scroll progress
-    progressHeight: 3,
+    typingSpeed: 65,
+    deletingSpeed: 35,
+    pauseAfterType: 2000,
+    pauseAfterDelete: 400,
   };
 
-  // Shared state
-  const mouse = { x: 0, y: 0, clientX: 0, clientY: 0 };
-  let isTabVisible = true;
-  let animationFrameId = null;
+  const state = {
+    isHeroVisible: true,
+    isTabVisible: true,
+    cmdPaletteOpen: false,
+    terminalOpen: false,
+    caseStudyOpen: false,
+    commandHistory: [],
+    historyIndex: -1,
+  };
 
   // ==========================================================================
-  // 2. UTILITY HELPERS
+  // 2. TOAST NOTIFICATION SYSTEM
   // ==========================================================================
-
-  function lerp(a, b, t) {
-    return a + (b - a) * t;
-  }
-
-  function clamp(v, min, max) {
-    return Math.max(min, Math.min(max, v));
-  }
-
-  function randomRange(min, max) {
-    return Math.random() * (max - min) + min;
-  }
-
-  function easeOutCubic(t) {
-    return 1 - Math.pow(1 - t, 3);
-  }
-
-  function throttle(fn, ms) {
-    let last = 0;
-    return function (...args) {
-      const now = performance.now();
-      if (now - last >= ms) {
-        last = now;
-        fn.apply(this, args);
-      }
-    };
-  }
-
-  function debounce(fn, ms) {
-    let timer;
-    return function (...args) {
-      clearTimeout(timer);
-      timer = setTimeout(() => fn.apply(this, args), ms);
-    };
-  }
-
-  // ==========================================================================
-  // 3. SCROLL PROGRESS BAR (dynamic element)
-  // ==========================================================================
-
-  const progressBar = document.createElement('div');
-  progressBar.id = 'scroll-progress';
-  Object.assign(progressBar.style, {
-    position: 'fixed',
-    top: '0',
-    left: '0',
-    height: CONFIG.progressHeight + 'px',
-    width: '0%',
-    background: 'linear-gradient(90deg, #00d4ff, #7b61ff)',
-    zIndex: '9998',
-    transition: 'width 0.1s linear',
-    pointerEvents: 'none',
-  });
-  document.body.appendChild(progressBar);
-
-  function updateScrollProgress() {
-    const scrollTop = window.scrollY;
-    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-    const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
-    progressBar.style.width = progress + '%';
-  }
-
-  // ==========================================================================
-  // 4. CUSTOM CURSOR (Desktop Only)
-  // ==========================================================================
-
-  let cursorDot = null;
-  let cursorRing = null;
-  let cursorPos = { x: 0, y: 0 };
-  let cursorRingPos = { x: 0, y: 0 };
-  let cursorVisible = false;
-  let cursorEnlarged = false;
-
-  function initCustomCursor() {
-    if (window.innerWidth <= CONFIG.cursorMinWidth) return;
-
-    // Create dot
-    cursorDot = document.createElement('div');
-    cursorDot.classList.add('cursor-dot');
-    Object.assign(cursorDot.style, {
-      position: 'fixed',
-      top: '0',
-      left: '0',
-      width: CONFIG.cursorDotSize + 'px',
-      height: CONFIG.cursorDotSize + 'px',
-      background: '#00d4ff',
-      borderRadius: '50%',
-      pointerEvents: 'none',
-      zIndex: '99999',
-      transform: 'translate(-50%, -50%)',
-      transition: 'opacity 0.3s, background 0.3s',
-      opacity: '0',
-      boxShadow: '0 0 10px #00d4ff88',
-    });
-    document.body.appendChild(cursorDot);
-
-    // Create ring
-    cursorRing = document.createElement('div');
-    cursorRing.classList.add('cursor-ring');
-    Object.assign(cursorRing.style, {
-      position: 'fixed',
-      top: '0',
-      left: '0',
-      width: CONFIG.cursorRingSize + 'px',
-      height: CONFIG.cursorRingSize + 'px',
-      border: '2px solid rgba(0, 212, 255, 0.5)',
-      borderRadius: '50%',
-      pointerEvents: 'none',
-      zIndex: '99998',
-      transform: 'translate(-50%, -50%)',
-      transition: 'width 0.3s, height 0.3s, border-color 0.3s, opacity 0.3s',
-      opacity: '0',
-    });
-    document.body.appendChild(cursorRing);
-
-    // Hide default cursor
-    document.body.style.cursor = 'none';
-
-    // Track all interactive elements
-    const interactiveSelectors = 'a, button, .project-card, .nav-toggle, input, textarea, [role="button"]';
-    document.querySelectorAll(interactiveSelectors).forEach(el => {
-      el.addEventListener('mouseenter', () => {
-        cursorEnlarged = true;
-        cursorRing.style.width = (CONFIG.cursorRingSize * 1.6) + 'px';
-        cursorRing.style.height = (CONFIG.cursorRingSize * 1.6) + 'px';
-        cursorRing.style.borderColor = 'rgba(123, 97, 255, 0.7)';
-        cursorDot.style.background = '#7b61ff';
-        cursorDot.style.boxShadow = '0 0 14px #7b61ff88';
-      });
-      el.addEventListener('mouseleave', () => {
-        cursorEnlarged = false;
-        cursorRing.style.width = CONFIG.cursorRingSize + 'px';
-        cursorRing.style.height = CONFIG.cursorRingSize + 'px';
-        cursorRing.style.borderColor = 'rgba(0, 212, 255, 0.5)';
-        cursorDot.style.background = '#00d4ff';
-        cursorDot.style.boxShadow = '0 0 10px #00d4ff88';
-      });
-    });
-
-    document.addEventListener('mouseenter', () => {
-      cursorVisible = true;
-      if (cursorDot) cursorDot.style.opacity = '1';
-      if (cursorRing) cursorRing.style.opacity = '1';
-    });
-
-    document.addEventListener('mouseleave', () => {
-      cursorVisible = false;
-      if (cursorDot) cursorDot.style.opacity = '0';
-      if (cursorRing) cursorRing.style.opacity = '0';
-    });
-  }
-
-  function updateCustomCursor() {
-    if (!cursorDot || !cursorRing) return;
-
-    cursorPos.x = mouse.clientX;
-    cursorPos.y = mouse.clientY;
-
-    cursorRingPos.x = lerp(cursorRingPos.x, mouse.clientX, CONFIG.cursorLerpFactor);
-    cursorRingPos.y = lerp(cursorRingPos.y, mouse.clientY, CONFIG.cursorLerpFactor);
-
-    cursorDot.style.left = cursorPos.x + 'px';
-    cursorDot.style.top = cursorPos.y + 'px';
-
-    cursorRing.style.left = cursorRingPos.x + 'px';
-    cursorRing.style.top = cursorRingPos.y + 'px';
-  }
-
-  // ==========================================================================
-  // 5. CINEMATIC INTRO ANIMATION
-  // ==========================================================================
-
-  function playCinematicIntro() {
-    const overlay = document.querySelector('.intro-overlay');
-    const logo = document.querySelector('.intro-logo');
-    const introText = document.querySelector('.intro-text');
-
-    if (!overlay) {
-      initMainExperience();
-      return;
-    }
-
-    // Lock scroll during intro
-    document.body.style.overflow = 'hidden';
-
-    // Logo scale-up animation
-    if (logo) {
-      logo.style.transform = 'scale(0.5)';
-      logo.style.opacity = '0';
-      logo.style.transition = 'transform 1.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s ease';
-      requestAnimationFrame(() => {
-        logo.style.transform = 'scale(1)';
-        logo.style.opacity = '1';
-      });
-
-      // Glow pulse via box-shadow animation
-      let pulseCount = 0;
-      const pulseInterval = setInterval(() => {
-        pulseCount++;
-        const intensity = Math.sin(pulseCount * 0.3) * 10 + 15;
-        logo.style.filter = `drop-shadow(0 0 ${intensity}px rgba(0, 212, 255, 0.6))`;
-        if (pulseCount > 30) clearInterval(pulseInterval);
-      }, 80);
-    }
-
-    // Intro text fade-in after delay
-    if (introText) {
-      introText.style.opacity = '0';
-      introText.style.transform = 'translateY(20px)';
-      introText.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
-      setTimeout(() => {
-        introText.style.opacity = '1';
-        introText.style.transform = 'translateY(0)';
-      }, 500);
-    }
-
-    // After introDuration, fade out overlay
-    setTimeout(() => {
-      overlay.style.transition = 'opacity 0.8s ease';
-      overlay.style.opacity = '0';
-
-      setTimeout(() => {
-        overlay.classList.add('hidden');
-        overlay.style.display = 'none';
-        document.body.style.overflow = '';
-        initMainExperience();
-      }, 800);
-    }, CONFIG.introDuration);
-  }
-
-  // ==========================================================================
-  // 6. THREE.JS 3D SCENE
-  // ==========================================================================
-
-  let scene, camera, renderer;
-  let particleSystem, geoMeshes = [];
-  let lights = {};
-  let clock;
-
-  function createParticleTexture() {
-    const canvas = document.createElement('canvas');
-    canvas.width = 64;
-    canvas.height = 64;
-    const ctx = canvas.getContext('2d');
-
-    const gradient = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
-    gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
-    gradient.addColorStop(0.2, 'rgba(255, 255, 255, 0.8)');
-    gradient.addColorStop(0.5, 'rgba(200, 220, 255, 0.3)');
-    gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
-
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, 64, 64);
-
-    const texture = new THREE.CanvasTexture(canvas);
-    texture.needsUpdate = true;
-    return texture;
-  }
-
-  function createParticleSystem() {
-    const geometry = new THREE.BufferGeometry();
-    const positions = new Float32Array(CONFIG.particleCount * 3);
-    const colors = new Float32Array(CONFIG.particleCount * 3);
-    const sizes = new Float32Array(CONFIG.particleCount);
-
-    const colorCyan = new THREE.Color(CONFIG.colors.cyan);
-    const colorPurple = new THREE.Color(CONFIG.colors.purple);
-    const colorMint = new THREE.Color(CONFIG.colors.mint);
-
-    for (let i = 0; i < CONFIG.particleCount; i++) {
-      // Distribute particles in a sphere
-      const theta = Math.random() * Math.PI * 2;
-      const phi = Math.acos(2 * Math.random() - 1);
-      const r = CONFIG.particleSphereRadius * Math.cbrt(Math.random());
-
-      positions[i * 3]     = r * Math.sin(phi) * Math.cos(theta);
-      positions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
-      positions[i * 3 + 2] = r * Math.cos(phi);
-
-      // Color: mix of cyan, purple, mint
-      const roll = Math.random();
-      let color;
-      if (roll < 0.45) {
-        color = colorCyan.clone().lerp(colorPurple, Math.random());
-      } else if (roll < 0.8) {
-        color = colorPurple.clone().lerp(colorMint, Math.random() * 0.5);
-      } else {
-        color = colorMint.clone();
-      }
-      colors[i * 3]     = color.r;
-      colors[i * 3 + 1] = color.g;
-      colors[i * 3 + 2] = color.b;
-
-      sizes[i] = randomRange(CONFIG.particleSizeMin, CONFIG.particleSizeMax);
-    }
-
-    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-    geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
-
-    const material = new THREE.PointsMaterial({
-      size: 0.12,
-      map: createParticleTexture(),
-      vertexColors: true,
-      transparent: true,
-      opacity: 0.85,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-      sizeAttenuation: true,
-    });
-
-    particleSystem = new THREE.Points(geometry, material);
-    scene.add(particleSystem);
-  }
-
-  function createFloatingGeometry() {
-    const geometries = [
-      () => new THREE.IcosahedronGeometry(randomRange(0.5, 1.2), 0),
-      () => new THREE.OctahedronGeometry(randomRange(0.5, 1.0), 0),
-      () => new THREE.TorusGeometry(randomRange(0.5, 1.0), randomRange(0.15, 0.3), 8, 16),
-      () => new THREE.TetrahedronGeometry(randomRange(0.6, 1.1), 0),
-      () => new THREE.DodecahedronGeometry(randomRange(0.5, 1.0), 0),
-      () => new THREE.IcosahedronGeometry(randomRange(0.8, 1.5), 1),
-      () => new THREE.OctahedronGeometry(randomRange(0.7, 1.2), 1),
-      () => new THREE.TorusGeometry(randomRange(0.6, 0.9), 0.2, 6, 24),
-    ];
-
-    const colorPalette = [
-      CONFIG.colors.cyan,
-      CONFIG.colors.purple,
-      CONFIG.colors.mint,
-      CONFIG.colors.pink,
-    ];
-
-    for (let i = 0; i < CONFIG.geoCount; i++) {
-      const geoFactory = geometries[i % geometries.length];
-      const geometry = geoFactory();
-      const isWireframe = Math.random() > 0.4;
-      const color = colorPalette[i % colorPalette.length];
-
-      const material = new THREE.MeshStandardMaterial({
-        color: color,
-        wireframe: isWireframe,
-        metalness: 0.3,
-        roughness: 0.2,
-        transparent: true,
-        opacity: isWireframe ? randomRange(0.3, 0.55) : randomRange(0.15, 0.35),
-        emissive: color,
-        emissiveIntensity: isWireframe ? 0.15 : 0.05,
-      });
-
-      const mesh = new THREE.Mesh(geometry, material);
-
-      const x = randomRange(-CONFIG.geoSpreadX, CONFIG.geoSpreadX);
-      const y = randomRange(-CONFIG.geoSpreadY, CONFIG.geoSpreadY);
-      const z = randomRange(CONFIG.geoSpreadZ.min, CONFIG.geoSpreadZ.max);
-
-      mesh.position.set(x, y, z);
-      mesh.rotation.set(
-        Math.random() * Math.PI,
-        Math.random() * Math.PI,
-        Math.random() * Math.PI
-      );
-
-      // Store animation metadata
-      mesh.userData = {
-        initialPos: { x, y, z },
-        rotSpeedX: randomRange(0.001, 0.006) * (Math.random() > 0.5 ? 1 : -1),
-        rotSpeedY: randomRange(0.001, 0.008) * (Math.random() > 0.5 ? 1 : -1),
-        floatSpeed: randomRange(0.3, 0.8),
-        floatAmplitude: randomRange(0.3, 1.0),
-        phase: Math.random() * Math.PI * 2,
-      };
-
-      scene.add(mesh);
-      geoMeshes.push(mesh);
-    }
-  }
-
-  function createLights() {
-    // Ambient
-    const ambient = new THREE.AmbientLight(CONFIG.colors.white, 0.3);
-    scene.add(ambient);
-
-    // Point light 1 — cyan
-    const light1 = new THREE.PointLight(CONFIG.colors.cyan, 1.5, 100);
-    light1.position.set(10, 10, 10);
-    scene.add(light1);
-
-    // Point light 2 — purple
-    const light2 = new THREE.PointLight(CONFIG.colors.purple, 1.2, 100);
-    light2.position.set(-10, -10, 5);
-    scene.add(light2);
-
-    // Point light 3 — pink
-    const light3 = new THREE.PointLight(CONFIG.colors.pink, 0.8, 80);
-    light3.position.set(0, 5, -10);
-    scene.add(light3);
-
-    lights = { ambient, light1, light2, light3 };
-  }
-
-  function initThreeScene() {
-    const container = document.getElementById('hero-canvas');
+  function showToast(message, icon = '✓') {
+    const container = document.getElementById('toast-container');
     if (!container) return;
 
-    // Scene
-    scene = new THREE.Scene();
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.setAttribute('role', 'status');
+    toast.innerHTML = `
+      <span class="toast-icon">${icon}</span>
+      <span class="toast-message">${message}</span>
+    `;
 
-    // Camera
-    camera = new THREE.PerspectiveCamera(
-      60,
-      window.innerWidth / window.innerHeight,
-      0.1,
-      200
-    );
-    camera.position.z = CONFIG.cameraZ;
+    container.appendChild(toast);
 
-    // Renderer
-    renderer = new THREE.WebGLRenderer({
-      antialias: true,
-      alpha: true,
-    });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.setClearColor(0x000000, 0);
-    container.appendChild(renderer.domElement);
-
-    // Clock for consistent timing
-    clock = new THREE.Clock();
-
-    // Build the scene
-    createParticleSystem();
-    createFloatingGeometry();
-    createLights();
-
-    // Start animation
-    animate();
+    setTimeout(() => {
+      toast.classList.add('toast-fade-out');
+      setTimeout(() => toast.remove(), 300);
+    }, 2800);
   }
 
-  // ==========================================================================
-  // 7. THREE.JS ANIMATION LOOP
-  // ==========================================================================
-
-  function animate() {
-    if (!isTabVisible) {
-      animationFrameId = requestAnimationFrame(animate);
-      return;
-    }
-
-    const elapsed = clock.getElapsedTime();
-
-    // --- Particle rotation ---
-    if (particleSystem) {
-      particleSystem.rotation.y += CONFIG.particleRotationSpeed;
-      particleSystem.rotation.x += CONFIG.particleRotationSpeed * 0.3;
-    }
-
-    // --- Geometric object animation ---
-    geoMeshes.forEach(mesh => {
-      const ud = mesh.userData;
-
-      // Rotation
-      mesh.rotation.x += ud.rotSpeedX;
-      mesh.rotation.y += ud.rotSpeedY;
-
-      // Floating sine motion
-      mesh.position.y = ud.initialPos.y +
-        Math.sin(elapsed * ud.floatSpeed + ud.phase) * ud.floatAmplitude;
-      mesh.position.x = ud.initialPos.x +
-        Math.sin(elapsed * ud.floatSpeed * 0.5 + ud.phase) * ud.floatAmplitude * 0.3;
-
-      // Mouse parallax on objects (opposite direction)
-      mesh.position.x += mouse.x * -0.3;
-      mesh.position.y += mouse.y * -0.2;
-    });
-
-    // --- Camera parallax ---
-    const targetCamX = mouse.x * CONFIG.cameraMaxOffset;
-    const targetCamY = mouse.y * CONFIG.cameraMaxOffset;
-    camera.position.x = lerp(camera.position.x, targetCamX, CONFIG.cameraParallaxFactor);
-    camera.position.y = lerp(camera.position.y, targetCamY, CONFIG.cameraParallaxFactor);
-    camera.lookAt(0, 0, 0);
-
-    // --- Light oscillation ---
-    if (lights.light1) {
-      lights.light1.position.x = 10 + Math.sin(elapsed * 0.5) * 3;
-      lights.light1.position.y = 10 + Math.cos(elapsed * 0.4) * 2;
-    }
-    if (lights.light2) {
-      lights.light2.position.x = -10 + Math.cos(elapsed * 0.6) * 3;
-      lights.light2.position.z = 5 + Math.sin(elapsed * 0.3) * 4;
-    }
-    if (lights.light3) {
-      lights.light3.position.y = 5 + Math.sin(elapsed * 0.7) * 3;
-      lights.light3.position.x = Math.cos(elapsed * 0.5) * 5;
-    }
-
-    // Render
-    renderer.render(scene, camera);
-
-    // Custom cursor
-    updateCustomCursor();
-
-    animationFrameId = requestAnimationFrame(animate);
-  }
-
-  // ==========================================================================
-  // 8. MOUSE TRACKING & PARALLAX
-  // ==========================================================================
-
-  function onMouseMove(e) {
-    mouse.clientX = e.clientX;
-    mouse.clientY = e.clientY;
-    mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
-    mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
-
-    // Hero content parallax
-    const heroContent = document.querySelector('.hero-content');
-    if (heroContent) {
-      const px = mouse.x * 15;
-      const py = -mouse.y * 10;
-      heroContent.style.transform = `translate(${px}px, ${py}px)`;
-    }
-  }
-
-  document.addEventListener('mousemove', onMouseMove, { passive: true });
-
-  // ==========================================================================
-  // 9. SCROLL REVEAL (IntersectionObserver)
-  // ==========================================================================
-
-  function initScrollReveal() {
-    const revealElements = document.querySelectorAll(
-      '.reveal, .reveal-left, .reveal-right, .reveal-scale'
-    );
-
-    if (!revealElements.length) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('active');
-          }
-        });
-      },
-      { threshold: 0.15, rootMargin: '0px 0px -40px 0px' }
-    );
-
-    revealElements.forEach(el => observer.observe(el));
-  }
-
-  // ==========================================================================
-  // 10. NAVBAR SCROLL EFFECTS
-  // ==========================================================================
-
-  function initNavbar() {
-    const navbar = document.querySelector('.navbar');
-    const navLinks = document.querySelectorAll('.nav-links a[href^="#"]');
-    const sections = document.querySelectorAll('section[id]');
-
-    function updateNavbar() {
-      if (!navbar) return;
-
-      // Scrolled class
-      if (window.scrollY > CONFIG.navScrollThreshold) {
-        navbar.classList.add('scrolled');
-      } else {
-        navbar.classList.remove('scrolled');
-      }
-
-      // Active section
-      let currentSection = '';
-      sections.forEach(section => {
-        const sectionTop = section.offsetTop - CONFIG.navbarHeight - 100;
-        const sectionBottom = sectionTop + section.offsetHeight;
-        if (window.scrollY >= sectionTop && window.scrollY < sectionBottom) {
-          currentSection = section.getAttribute('id');
-        }
-      });
-
-      navLinks.forEach(link => {
-        link.classList.remove('active');
-        if (link.getAttribute('href') === '#' + currentSection) {
-          link.classList.add('active');
-        }
-      });
-    }
-
-    window.addEventListener('scroll', throttle(updateNavbar, 100), { passive: true });
-    updateNavbar();
-  }
-
-  // ==========================================================================
-  // 11. SMOOTH SCROLL NAVIGATION
-  // ==========================================================================
-
-  function initSmoothScroll() {
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-      anchor.addEventListener('click', (e) => {
-        const href = anchor.getAttribute('href');
-        if (href === '#') return;
-
-        const target = document.querySelector(href);
-        if (!target) return;
-
-        e.preventDefault();
-        const top = target.offsetTop - CONFIG.navbarHeight;
-        window.scrollTo({ top, behavior: 'smooth' });
-
-        // Close mobile menu if open
-        const navLinksContainer = document.querySelector('.nav-links');
-        if (navLinksContainer) {
-          navLinksContainer.classList.remove('active');
-        }
-      });
+  // Copy Email Helper
+  function copyEmailToClipboard() {
+    navigator.clipboard.writeText(CONFIG.email).then(() => {
+      showToast(`Email copied: ${CONFIG.email}`, '📋');
+    }).catch(() => {
+      showToast(CONFIG.email, '📋');
     });
   }
 
-  // ==========================================================================
-  // 12. 3D TILT EFFECT ON PROJECT CARDS
-  // ==========================================================================
+  // Bind all copy buttons
+  document.querySelectorAll('.copy-email-btn, .copy-email-tile').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      copyEmailToClipboard();
+    });
+  });
 
-  function initCardTilt() {
-    const cards = document.querySelectorAll('.project-card');
-
+  // ==========================================================================
+  // 3. MOUSE-TRACKING SPOTLIGHT BORDERS
+  // ==========================================================================
+  function initSpotlightCards() {
+    const cards = document.querySelectorAll('.spotlight-card');
     cards.forEach(card => {
-      // Create glare overlay
-      const glare = document.createElement('div');
-      Object.assign(glare.style, {
-        position: 'absolute',
-        top: '0',
-        left: '0',
-        width: '100%',
-        height: '100%',
-        pointerEvents: 'none',
-        borderRadius: 'inherit',
-        background: 'radial-gradient(circle at 50% 50%, rgba(255,255,255,0.12) 0%, transparent 60%)',
-        opacity: '0',
-        transition: 'opacity 0.3s ease',
-        zIndex: '2',
-      });
-      // Ensure card is positioned
-      if (getComputedStyle(card).position === 'static') {
-        card.style.position = 'relative';
-      }
-      card.style.overflow = 'hidden';
-      card.appendChild(glare);
-
-      card.addEventListener('mousemove', (e) => {
+      card.addEventListener('pointermove', (e) => {
         const rect = card.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
-
-        const rotateY = ((x - centerX) / centerX) * CONFIG.tiltMax;
-        const rotateX = ((centerY - y) / centerY) * CONFIG.tiltMax;
-
-        card.style.transform =
-          `perspective(${CONFIG.tiltPerspective}px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(10px)`;
-        card.style.transition = 'transform 0.1s ease';
-
-        // Move glare
-        const glareX = (x / rect.width) * 100;
-        const glareY = (y / rect.height) * 100;
-        glare.style.background =
-          `radial-gradient(circle at ${glareX}% ${glareY}%, rgba(255,255,255,0.15) 0%, transparent 60%)`;
-        glare.style.opacity = '1';
-      }, { passive: true });
-
-      card.addEventListener('mouseleave', () => {
-        card.style.transform =
-          `perspective(${CONFIG.tiltPerspective}px) rotateX(0deg) rotateY(0deg) translateZ(0px)`;
-        card.style.transition = 'transform 0.6s cubic-bezier(0.23, 1, 0.32, 1)';
-        glare.style.opacity = '0';
+        card.style.setProperty('--mouse-x', `${x}px`);
+        card.style.setProperty('--mouse-y', `${y}px`);
       });
     });
   }
+  initSpotlightCards();
 
   // ==========================================================================
-  // 13. SKILL SPHERE ANIMATIONS
+  // 4. COMMAND PALETTE (CMD+K / CTRL+K)
   // ==========================================================================
+  const cmdPalette = document.getElementById('cmd-palette');
+  const cmdInput = document.getElementById('cmd-input');
+  const cmdResults = document.getElementById('cmd-results');
+  const cmdItems = Array.from(cmdResults ? cmdResults.querySelectorAll('.cmd-item') : []);
+  let selectedCmdIndex = 0;
 
-  function initSkillSpheres() {
-    const spheres = document.querySelectorAll('.skill-sphere');
+  function openCommandPalette() {
+    if (!cmdPalette) return;
+    state.cmdPaletteOpen = true;
+    cmdPalette.classList.add('active');
+    cmdPalette.setAttribute('aria-hidden', 'false');
+    if (cmdInput) {
+      cmdInput.value = '';
+      cmdInput.focus();
+    }
+    filterCmdItems('');
+  }
 
-    spheres.forEach((sphere, i) => {
-      // Random floating animation delay
-      sphere.style.animationDelay = (i * 0.15 + Math.random() * 0.5) + 's';
-      sphere.style.animationDuration = randomRange(3, 5) + 's';
+  function closeCommandPalette() {
+    if (!cmdPalette) return;
+    state.cmdPaletteOpen = false;
+    cmdPalette.classList.remove('active');
+    cmdPalette.setAttribute('aria-hidden', 'true');
+  }
 
-      // Apply a subtle float if no CSS animation is defined
-      if (!getComputedStyle(sphere).animationName || getComputedStyle(sphere).animationName === 'none') {
-        const keyframes = [
-          { transform: 'translateY(0px)' },
-          { transform: `translateY(${randomRange(-8, -4)}px)` },
-          { transform: 'translateY(0px)' },
-        ];
-        sphere.animate(keyframes, {
-          duration: randomRange(3000, 5000),
-          iterations: Infinity,
-          easing: 'ease-in-out',
-          delay: i * 150 + Math.random() * 500,
-        });
+  function filterCmdItems(query) {
+    const q = query.toLowerCase().trim();
+    let visibleCount = 0;
+
+    cmdItems.forEach(item => {
+      const text = item.textContent.toLowerCase();
+      if (!q || text.includes(q)) {
+        item.style.display = 'flex';
+        visibleCount++;
+      } else {
+        item.style.display = 'none';
       }
     });
 
-    // Skill level bars animate on scroll
-    const skillFills = document.querySelectorAll('.skill-level-fill');
-    if (skillFills.length) {
-      const observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach(entry => {
-            if (entry.isIntersecting) {
-              const fill = entry.target;
-              const targetWidth = fill.getAttribute('data-width') || fill.style.width || '0%';
-              fill.style.width = '0%';
-              fill.style.transition = 'width 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.2s';
-              requestAnimationFrame(() => {
-                fill.style.width = targetWidth;
-              });
-              observer.unobserve(fill);
-            }
-          });
-        },
-        { threshold: 0.3 }
-      );
-      skillFills.forEach(fill => {
-        // Store target width before zeroing
-        const computed = fill.style.width || getComputedStyle(fill).width;
-        if (!fill.getAttribute('data-width')) {
-          fill.setAttribute('data-width', computed);
-        }
-        observer.observe(fill);
-      });
+    // Update selection to first visible
+    const visibleItems = cmdItems.filter(item => item.style.display !== 'none');
+    selectedCmdIndex = 0;
+    visibleItems.forEach((item, idx) => {
+      if (idx === selectedCmdIndex) {
+        item.classList.add('selected');
+      } else {
+        item.classList.remove('selected');
+      }
+    });
+  }
+
+  function executeCmdItem(item) {
+    if (!item) return;
+    const action = item.dataset.action;
+
+    closeCommandPalette();
+
+    if (action === 'navigate') {
+      const target = document.querySelector(item.dataset.target);
+      if (target) {
+        const top = target.offsetTop - 70;
+        window.scrollTo({ top, behavior: 'smooth' });
+      }
+    } else if (action === 'copy-email') {
+      copyEmailToClipboard();
+    } else if (action === 'download-resume') {
+      window.location.href = 'resume.pdf';
+      showToast('Downloading resume.pdf...', '📄');
+    } else if (action === 'open-terminal') {
+      openTerminal();
+    } else if (action === 'run-sandbox') {
+      const p = document.getElementById('projects');
+      if (p) window.scrollTo({ top: p.offsetTop - 70, behavior: 'smooth' });
+      triggerSampleClassification('plastic');
+    } else if (action === 'external') {
+      window.open(item.dataset.url, '_blank', 'noopener,noreferrer');
     }
   }
 
-  // ==========================================================================
-  // 14. ANIMATED COUNTERS
-  // ==========================================================================
+  // Keyboard navigation inside Command Palette
+  if (cmdInput) {
+    cmdInput.addEventListener('input', (e) => {
+      filterCmdItems(e.target.value);
+    });
 
-  function initCounters() {
-    const counters = document.querySelectorAll('.counter');
-    if (!counters.length) return;
+    cmdInput.addEventListener('keydown', (e) => {
+      const visibleItems = cmdItems.filter(item => item.style.display !== 'none');
+      if (!visibleItems.length) return;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            const el = entry.target;
-            if (el.dataset.counted) return;
-            el.dataset.counted = 'true';
-
-            const target = parseInt(el.getAttribute('data-target'), 10) || 0;
-            const startTime = performance.now();
-
-            function updateCounter(now) {
-              const elapsed = now - startTime;
-              const progress = Math.min(elapsed / CONFIG.counterDuration, 1);
-              const easedProgress = easeOutCubic(progress);
-              const current = Math.round(target * easedProgress);
-              el.textContent = current + '+';
-
-              if (progress < 1) {
-                requestAnimationFrame(updateCounter);
-              } else {
-                el.textContent = target + '+';
-              }
-            }
-
-            requestAnimationFrame(updateCounter);
-            observer.unobserve(el);
-          }
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        selectedCmdIndex = (selectedCmdIndex + 1) % visibleItems.length;
+        visibleItems.forEach((item, idx) => {
+          item.classList.toggle('selected', idx === selectedCmdIndex);
         });
-      },
-      { threshold: 0.5 }
-    );
-
-    counters.forEach(c => observer.observe(c));
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        selectedCmdIndex = (selectedCmdIndex - 1 + visibleItems.length) % visibleItems.length;
+        visibleItems.forEach((item, idx) => {
+          item.classList.toggle('selected', idx === selectedCmdIndex);
+        });
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        executeCmdItem(visibleItems[selectedCmdIndex]);
+      }
+    });
   }
 
+  // Click handler on Command Items
+  cmdItems.forEach(item => {
+    item.addEventListener('click', () => executeCmdItem(item));
+  });
+
+  // Global Shortcut: Cmd+K or Ctrl+K
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+      e.preventDefault();
+      if (state.cmdPaletteOpen) {
+        closeCommandPalette();
+      } else {
+        openCommandPalette();
+      }
+    } else if (e.key === 'Escape') {
+      if (state.cmdPaletteOpen) closeCommandPalette();
+      if (state.terminalOpen) closeTerminal();
+      if (state.caseStudyOpen) closeCaseStudy();
+    }
+  });
+
+  // Trigger buttons
+  document.getElementById('cmd-k-trigger')?.addEventListener('click', openCommandPalette);
+  document.getElementById('cmd-close-btn')?.addEventListener('click', closeCommandPalette);
+  cmdPalette?.addEventListener('click', (e) => {
+    if (e.target === cmdPalette) closeCommandPalette();
+  });
+
   // ==========================================================================
-  // 15. MOBILE MENU TOGGLE
+  // 5. INTERACTIVE DEVELOPER TERMINAL (CLI MODE)
   // ==========================================================================
+  const terminalDrawer = document.getElementById('terminal-drawer');
+  const terminalInput = document.getElementById('terminal-input');
+  const terminalHistory = document.getElementById('terminal-history');
+  const terminalCloseBtn = document.getElementById('terminal-close-btn');
 
-  function initMobileMenu() {
-    const toggle = document.querySelector('.nav-toggle');
-    const navLinks = document.querySelector('.nav-links');
+  function openTerminal() {
+    if (!terminalDrawer) return;
+    state.terminalOpen = true;
+    terminalDrawer.classList.add('active');
+    terminalDrawer.setAttribute('aria-hidden', 'false');
+    setTimeout(() => terminalInput?.focus(), 150);
+  }
 
-    if (!toggle || !navLinks) return;
+  function closeTerminal() {
+    if (!terminalDrawer) return;
+    state.terminalOpen = false;
+    terminalDrawer.classList.remove('active');
+    terminalDrawer.setAttribute('aria-hidden', 'true');
+  }
 
-    toggle.addEventListener('click', (e) => {
-      e.stopPropagation();
-      navLinks.classList.toggle('active');
-      toggle.classList.toggle('active');
+  terminalCloseBtn?.addEventListener('click', closeTerminal);
+  terminalDrawer?.addEventListener('click', (e) => {
+    if (e.target === terminalDrawer) closeTerminal();
+  });
+  document.getElementById('terminal-trigger-btn')?.addEventListener('click', openTerminal);
+  document.getElementById('hero-terminal-btn')?.addEventListener('click', openTerminal);
+  document.querySelectorAll('.open-terminal-btn').forEach(btn => {
+    btn.addEventListener('click', openTerminal);
+  });
+
+  // Terminal Chips Click Handler
+  document.querySelectorAll('.terminal-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const cmd = chip.dataset.cmd;
+      if (cmd) {
+        runTerminalCommand(cmd);
+      }
     });
+  });
 
-    // Close on link click
-    navLinks.querySelectorAll('a').forEach(link => {
-      link.addEventListener('click', () => {
-        navLinks.classList.remove('active');
-        toggle.classList.remove('active');
-      });
-    });
+  function logTerminal(input, outputHtml) {
+    if (!terminalHistory) return;
+    const log = document.createElement('div');
+    log.className = 'terminal-command-log';
+    log.innerHTML = `
+      <div class="cmd-log-input"><span class="term-user">shailesh</span><span class="term-at">@</span><span class="term-host">portfolio</span>:<span class="term-path">~</span>$ ${escapeHtml(input)}</div>
+      <div class="cmd-log-output">${outputHtml}</div>
+    `;
+    terminalHistory.appendChild(log);
+    const body = document.getElementById('terminal-body');
+    if (body) body.scrollTop = body.scrollHeight;
+  }
 
-    // Close on outside click
-    document.addEventListener('click', (e) => {
-      if (!navLinks.contains(e.target) && !toggle.contains(e.target)) {
-        navLinks.classList.remove('active');
-        toggle.classList.remove('active');
+  function escapeHtml(str) {
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  function runTerminalCommand(raw) {
+    const trimmed = raw.trim();
+    if (!trimmed) return;
+
+    state.commandHistory.push(trimmed);
+    state.historyIndex = state.commandHistory.length;
+
+    const parts = trimmed.split(' ');
+    const command = parts[0].toLowerCase();
+    const arg = parts.slice(1).join(' ').toLowerCase();
+
+    if (command === 'clear') {
+      if (terminalHistory) terminalHistory.innerHTML = '';
+      return;
+    }
+
+    let output = '';
+
+    switch (command) {
+      case 'help':
+        output = `
+Available System Commands:
+  <span class="term-hl">bio</span>         &mdash; High-level professional background
+  <span class="term-hl">skills</span>      &mdash; Core technical competencies & toolchain
+  <span class="term-hl">projects</span>    &mdash; Summary of featured engineering projects
+  <span class="term-hl">telemetry</span>   &mdash; 427 LeetCode problems breakdown
+  <span class="term-hl">contact</span>     &mdash; Direct contact coordinates
+  <span class="term-hl">sudo hire</span>   &mdash; Fast-track interview / hiring flow
+  <span class="term-hl">clear</span>       &mdash; Clear terminal buffer
+  <span class="term-hl">exit</span>        &mdash; Close this terminal session
+        `.trim();
+        break;
+
+      case 'bio':
+        output = `
+Shailesh Kumaar &bull; Computer Science Engineer
+Education: B.E. Computer Science, Sathyabama IST (2022-2026, CGPA 8.11)
+Focus: Full-Stack Web Development, Software Engineering & Algorithmic Problem Solving.
+LeetCode: 427 solved problems (277 Easy, 138 Medium, 12 Hard).
+Final Year Project: Smart Waste Segregation Assistant (MobileNetV2 on Raspberry Pi).
+        `.trim();
+        break;
+
+      case 'skills':
+        output = `
+Technical Competencies:
+  &bull; Languages: Python, Java, JavaScript (ES6+), SQL, C/C++
+  &bull; Machine Learning & Vision: MobileNetV2, OpenCV, Raspberry Pi
+  &bull; Full-Stack: PHP, MySQL (Normalized schemas), REST APIs, React, CSS Grid
+  &bull; Tools: Linux/Bash, Git, GitHub Actions, Vercel, VS Code
+        `.trim();
+        break;
+
+      case 'projects':
+        output = `
+Featured Projects:
+  1. <span class="term-hl">Smart Waste Segregation Assistant (Final Year Project)</span> &mdash; MobileNetV2 on Raspberry Pi with audio guidance
+  2. <span class="term-hl">Tourism Management Portal</span> &mdash; Full-Stack PHP & MySQL web application
+  3. <span class="term-hl">CGPA Calculator Engine</span> &mdash; Academic performance engine & task organizer
+  4. <span class="term-hl">DSA Repository</span> &mdash; 427 LeetCode solutions (277 Easy, 138 Med, 12 Hard)
+Type <span class="term-hl">contact</span> to get in touch.
+        `.trim();
+        break;
+
+      case 'telemetry':
+        output = `
+Algorithmic Benchmark (LeetCode 427 Solved):
+  [==============================] Easy:   277 problems (65%)
+  [===============]               Medium: 138 problems (32%)
+  [=]                             Hard:   12 problems (3%)
+Total: 427 verified solutions.
+        `.trim();
+        break;
+
+      case 'contact':
+        output = `
+Direct Channels:
+  Email:    <a href="mailto:${CONFIG.email}" class="term-hl">${CONFIG.email}</a>
+  LinkedIn: <a href="https://www.linkedin.com/in/shailesh-kumaar2707/" target="_blank" class="term-hl">linkedin.com/in/shailesh-kumaar2707</a>
+  GitHub:   <a href="https://github.com/shailesh7705" target="_blank" class="term-hl">github.com/shailesh7705</a>
+  LeetCode: <a href="https://leetcode.com/u/shailesh7705/" target="_blank" class="term-hl">leetcode.com/u/shailesh7705</a>
+        `.trim();
+        break;
+
+      case 'sudo':
+        if (arg === 'hire' || arg === 'hire shailesh') {
+          output = `
+🎉 <span class="term-hl">ACCESS GRANTED: CANDIDATE ACQUISITION PROTOCOL INITIATED!</span>
+Thank you for recognizing top 1% engineering talent.
+Initiating direct email link: <a href="mailto:${CONFIG.email}?subject=Interview%20Invitation%20-%20Shailesh%20Kumaar" class="term-hl">${CONFIG.email}</a>
+Or call/schedule via LinkedIn: <a href="https://www.linkedin.com/in/shailesh-kumaar2707/" target="_blank" class="term-hl">LinkedIn Connection</a>
+          `.trim();
+          showToast('Sudo Hire unlocked! Direct channel ready.', '🚀');
+        } else {
+          output = `Permission denied: try 'sudo hire'`;
+        }
+        break;
+
+      case 'exit':
+        closeTerminal();
+        return;
+
+      default:
+        output = `command not found: ${escapeHtml(command)}. Type <span class="term-hl">help</span> for commands.`;
+    }
+
+    logTerminal(trimmed, output);
+  }
+
+  if (terminalInput) {
+    terminalInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const val = terminalInput.value;
+        terminalInput.value = '';
+        runTerminalCommand(val);
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (state.historyIndex > 0) {
+          state.historyIndex--;
+          terminalInput.value = state.commandHistory[state.historyIndex] || '';
+        }
+      } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (state.historyIndex < state.commandHistory.length - 1) {
+          state.historyIndex++;
+          terminalInput.value = state.commandHistory[state.historyIndex] || '';
+        } else {
+          state.historyIndex = state.commandHistory.length;
+          terminalInput.value = '';
+        }
       }
     });
   }
 
   // ==========================================================================
-  // 16. TYPING EFFECT
+  // 6. INTERACTIVE WASTE CLASSIFIER PREVIEW
   // ==========================================================================
+  const sampleDatabase = {
+    plastic: {
+      title: 'Plastic Bottle',
+      confidence: 95,
+      cue: '"Please place in the Plastic bin"',
+    },
+    metal: {
+      title: 'Metal Can',
+      confidence: 96,
+      cue: '"Please place in the Metal bin"',
+    },
+    paper: {
+      title: 'Paper Cup',
+      confidence: 92,
+      cue: '"Please place in the Paper bin"',
+    },
+    organic: {
+      title: 'Organic Waste',
+      confidence: 94,
+      cue: '"Please place in the Organic bin"',
+    },
+  };
 
+  function triggerSampleClassification(sampleKey) {
+    const data = sampleDatabase[sampleKey];
+    if (!data) return;
+
+    // Update active button
+    document.querySelectorAll('.sample-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.sample === sampleKey);
+    });
+
+    const classEl = document.getElementById('output-class');
+    const barEl = document.getElementById('output-confidence-bar');
+    const confEl = document.getElementById('output-confidence');
+    const cueEl = document.getElementById('output-cue');
+
+    if (classEl) classEl.textContent = data.title;
+    if (barEl) barEl.style.width = data.confidence + '%';
+    if (confEl) confEl.textContent = data.confidence + '%';
+    if (cueEl) cueEl.textContent = data.cue;
+
+    showToast(`Classified as: ${data.title}`, '♻️');
+  }
+
+  document.querySelectorAll('.sample-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const s = btn.dataset.sample;
+      if (s) triggerSampleClassification(s);
+    });
+  });
+
+  // ==========================================================================
+  // 7. CASE STUDY & ARCHITECTURE MODAL
+  // ==========================================================================
+  const caseStudyModal = document.getElementById('case-study-modal');
+  const modalTag = document.getElementById('modal-tag');
+  const modalTitle = document.getElementById('modal-title');
+  const modalBody = document.getElementById('modal-body');
+  const modalCloseBtn = document.getElementById('case-study-close-btn');
+
+  const caseStudiesData = {
+    'waste-assistant': {
+      tag: 'FINAL YEAR ACADEMIC PROJECT',
+      title: 'Smart Waste Segregation Assistant',
+      html: `
+        <div class="cs-section">
+          <h4 class="cs-section-title">Project Overview</h4>
+          <p>
+            Developed as my final year engineering project. The objective was to build an automated waste classification prototype to make sorting everyday waste convenient and accessible.
+          </p>
+        </div>
+
+        <div class="cs-section">
+          <h4 class="cs-section-title">How It Works</h4>
+          <div class="cs-architecture-flow">
+            <span class="flow-node">Camera Input</span>
+            <span class="flow-arrow">&rarr;</span>
+            <span class="flow-node">OpenCV Preprocessing</span>
+            <span class="flow-arrow">&rarr;</span>
+            <span class="flow-node active-node">MobileNetV2 Model</span>
+            <span class="flow-arrow">&rarr;</span>
+            <span class="flow-node">Audio Guidance Prompt</span>
+          </div>
+        </div>
+
+        <div class="cs-section">
+          <h4 class="cs-section-title">Key Components</h4>
+          <ul style="padding-left: 20px; line-height: 1.8;">
+            <li><strong>Model:</strong> Uses a lightweight MobileNetV2 architecture suited for running on compact hardware like the Raspberry Pi.</li>
+            <li><strong>Categories:</strong> Trained to identify common waste items such as plastics, metals, paper, and organic waste.</li>
+            <li><strong>Audio Output:</strong> Automatically plays a voice prompt guiding the user to the correct disposal bin upon classification.</li>
+          </ul>
+        </div>
+      `,
+    },
+    'tourism-portal': {
+      tag: 'FULL STACK ARCHITECTURE & SQL',
+      title: 'Enterprise Tourism Management & Booking System',
+      html: `
+        <div class="cs-section">
+          <h4 class="cs-section-title">Problem Statement</h4>
+          <p>
+            Tourism service operators struggle with fragmented booking databases, leading to double-booking anomalies, inconsistent customer records, and difficult package administration.
+          </p>
+        </div>
+
+        <div class="cs-section">
+          <h4 class="cs-section-title">Database & Application Design</h4>
+          <div class="cs-architecture-flow">
+            <span class="flow-node">Client (Responsive Web)</span>
+            <span class="flow-arrow">&rarr;</span>
+            <span class="flow-node">Role-Based Auth (PHP Session Guards)</span>
+            <span class="flow-arrow">&rarr;</span>
+            <span class="flow-node active-node">Transactional MySQL 3NF Schema</span>
+            <span class="flow-arrow">&rarr;</span>
+            <span class="flow-node">Automated Booking State Engine</span>
+          </div>
+        </div>
+
+        <div class="cs-section">
+          <h4 class="cs-section-title">Key Engineering Highlights</h4>
+          <ul style="padding-left: 20px; line-height: 1.8;">
+            <li><strong>ACID Transaction Compliance:</strong> Enforced atomic SQL transactions during seat reservation checkout, guaranteeing zero concurrency collisions.</li>
+            <li><strong>Admin Command Center:</strong> Built modular dashboards allowing real-time package updates, price adjustments, and analytical user reports.</li>
+            <li><strong>Security:</strong> Prepared statements across all database queries to prevent SQL injection and strict input sanitization against XSS.</li>
+          </ul>
+        </div>
+      `,
+    },
+  };
+
+  function openCaseStudy(projectId) {
+    const data = caseStudiesData[projectId];
+    if (!data || !caseStudyModal) return;
+
+    state.caseStudyOpen = true;
+    modalTag.textContent = data.tag;
+    modalTitle.textContent = data.title;
+    modalBody.innerHTML = data.html;
+
+    caseStudyModal.classList.add('active');
+    caseStudyModal.setAttribute('aria-hidden', 'false');
+  }
+
+  function closeCaseStudy() {
+    if (!caseStudyModal) return;
+    state.caseStudyOpen = false;
+    caseStudyModal.classList.remove('active');
+    caseStudyModal.setAttribute('aria-hidden', 'true');
+  }
+
+  modalCloseBtn?.addEventListener('click', closeCaseStudy);
+  caseStudyModal?.addEventListener('click', (e) => {
+    if (e.target === caseStudyModal) closeCaseStudy();
+  });
+
+  document.querySelectorAll('.open-case-study-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const pid = btn.dataset.project;
+      if (pid) openCaseStudy(pid);
+    });
+  });
+
+  // ==========================================================================
+  // 8. PROJECT CATEGORY FILTERING
+  // ==========================================================================
+  const filterButtons = document.querySelectorAll('.filter-btn');
+  const projectCards = document.querySelectorAll('.project-card');
+
+  filterButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const filter = btn.dataset.filter;
+      filterButtons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      projectCards.forEach(card => {
+        const cat = card.dataset.category;
+        if (filter === 'all' || cat === filter) {
+          card.classList.remove('hidden');
+        } else {
+          card.classList.add('hidden');
+        }
+      });
+    });
+  });
+
+  // ==========================================================================
+  // 9. TYPING EFFECT
+  // ==========================================================================
   function initTypingEffect() {
-    const el = document.querySelector('.hero-subtitle');
-    if (!el) return;
+    const textSpan = document.querySelector('.hero-subtitle .typing-text');
+    if (!textSpan) return;
 
     const strings = CONFIG.typingStrings;
     let stringIndex = 0;
     let charIndex = 0;
     let isDeleting = false;
-    let typingTimeout = null;
-
-    // Create cursor element
-    const cursor = document.createElement('span');
-    cursor.classList.add('typing-cursor');
-    cursor.textContent = '|';
-    Object.assign(cursor.style, {
-      display: 'inline-block',
-      animation: 'blink-cursor 0.7s step-end infinite',
-      marginLeft: '2px',
-      fontWeight: '100',
-      color: '#00d4ff',
-    });
-
-    // Inject keyframe for cursor blink if not exists
-    if (!document.getElementById('typing-cursor-style')) {
-      const style = document.createElement('style');
-      style.id = 'typing-cursor-style';
-      style.textContent = `
-        @keyframes blink-cursor {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0; }
-        }
-      `;
-      document.head.appendChild(style);
-    }
-
-    // Create a span for typed text
-    const textSpan = document.createElement('span');
-    textSpan.classList.add('typed-text');
-    el.textContent = '';
-    el.appendChild(textSpan);
-    el.appendChild(cursor);
 
     function type() {
       const currentString = strings[stringIndex];
 
       if (!isDeleting) {
-        // Typing
         textSpan.textContent = currentString.substring(0, charIndex + 1);
         charIndex++;
 
         if (charIndex === currentString.length) {
           isDeleting = true;
-          typingTimeout = setTimeout(type, CONFIG.pauseAfterType);
+          setTimeout(type, CONFIG.pauseAfterType);
           return;
         }
-        typingTimeout = setTimeout(type, CONFIG.typingSpeed + Math.random() * 40);
+        setTimeout(type, CONFIG.typingSpeed);
       } else {
-        // Deleting
         textSpan.textContent = currentString.substring(0, charIndex - 1);
         charIndex--;
 
         if (charIndex === 0) {
           isDeleting = false;
           stringIndex = (stringIndex + 1) % strings.length;
-          typingTimeout = setTimeout(type, CONFIG.pauseAfterDelete);
+          setTimeout(type, CONFIG.pauseAfterDelete);
           return;
         }
-        typingTimeout = setTimeout(type, CONFIG.deletingSpeed);
+        setTimeout(type, CONFIG.deletingSpeed);
       }
     }
 
-    // Start after a brief delay
-    setTimeout(type, 600);
+    type();
   }
+  initTypingEffect();
 
   // ==========================================================================
-  // 17. PAGE VISIBILITY (Pause/Resume)
+  // 10. SCROLL PROGRESS BAR & NAVBAR ACTIVE STATE
   // ==========================================================================
+  const progressBar = document.getElementById('scroll-progress');
+  const navbar = document.getElementById('navbar');
+  const navLinks = document.querySelectorAll('.nav-links .nav-link');
+  const sections = document.querySelectorAll('section[id], header[id]');
 
-  function initVisibilityHandler() {
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden) {
-        isTabVisible = false;
+  function updateScrollState() {
+    const scrollY = window.scrollY;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const progress = docHeight > 0 ? (scrollY / docHeight) * 100 : 0;
+
+    if (progressBar) progressBar.style.width = progress + '%';
+
+    if (navbar) {
+      if (scrollY > 50) {
+        navbar.classList.add('scrolled');
       } else {
-        isTabVisible = true;
-        if (clock) clock.getDelta(); // Reset delta to avoid huge jump
+        navbar.classList.remove('scrolled');
       }
+    }
+
+    // Active Section Tracking
+    let currentId = '';
+    sections.forEach(sec => {
+      const top = sec.offsetTop - 120;
+      const bottom = top + sec.offsetHeight;
+      if (scrollY >= top && scrollY < bottom) {
+        currentId = sec.getAttribute('id');
+      }
+    });
+
+    navLinks.forEach(link => {
+      const href = link.getAttribute('href');
+      link.classList.toggle('active', href === `#${currentId}`);
     });
   }
 
-  // ==========================================================================
-  // 18. WINDOW RESIZE HANDLER
-  // ==========================================================================
+  window.addEventListener('scroll', updateScrollState, { passive: true });
+  updateScrollState();
 
-  function onWindowResize() {
-    if (camera) {
+  // Mobile menu toggle
+  const navToggle = document.getElementById('nav-toggle');
+  const navLinksContainer = document.getElementById('nav-links');
+  navToggle?.addEventListener('click', () => {
+    const expanded = navToggle.getAttribute('aria-expanded') === 'true';
+    navToggle.setAttribute('aria-expanded', !expanded);
+    navLinksContainer?.classList.toggle('active');
+  });
+
+  navLinks.forEach(link => {
+    link.addEventListener('click', () => {
+      navLinksContainer?.classList.remove('active');
+      navToggle?.setAttribute('aria-expanded', 'false');
+    });
+  });
+
+  // ==========================================================================
+  // 11. SCROLL REVEAL (INTERSECTION OBSERVER)
+  // ==========================================================================
+  function initScrollReveal() {
+    const reveals = document.querySelectorAll('.reveal, .reveal-left, .reveal-right');
+    if (!reveals.length) return;
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('active');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+    reveals.forEach(el => observer.observe(el));
+  }
+  initScrollReveal();
+
+  // ==========================================================================
+  // 12. THREE.JS 3D CANVAS (HIGH-PERFORMANCE WITH OBSERVER PAUSE)
+  // ==========================================================================
+  let scene, camera, renderer, particleSystem, clock;
+  let animFrameId = null;
+
+  function initThreeCanvas() {
+    const container = document.getElementById('hero-canvas');
+    if (!container || typeof THREE === 'undefined') return;
+
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
+    camera.position.z = 25;
+
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+    renderer.setClearColor(0x000000, 0);
+    container.appendChild(renderer.domElement);
+
+    clock = new THREE.Clock();
+
+    // Create refined glowing starfield
+    const particleCount = window.innerWidth < 768 ? 500 : 1200;
+    const geometry = new THREE.BufferGeometry();
+    const positions = new Float32Array(particleCount * 3);
+    const colors = new Float32Array(particleCount * 3);
+
+    const cyan = new THREE.Color(0x00f5d4);
+    const blue = new THREE.Color(0x00d4ff);
+    const purple = new THREE.Color(0x8b5cf6);
+
+    for (let i = 0; i < particleCount; i++) {
+      const radius = 35 * Math.cbrt(Math.random());
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.acos(2 * Math.random() - 1);
+
+      positions[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
+      positions[i * 3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
+      positions[i * 3 + 2] = radius * Math.cos(phi);
+
+      const roll = Math.random();
+      const col = roll < 0.4 ? cyan : (roll < 0.75 ? blue : purple);
+      colors[i * 3] = col.r;
+      colors[i * 3 + 1] = col.g;
+      colors[i * 3 + 2] = col.b;
+    }
+
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+    const material = new THREE.PointsMaterial({
+      size: 0.14,
+      vertexColors: true,
+      transparent: true,
+      opacity: 0.85,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    });
+
+    particleSystem = new THREE.Points(geometry, material);
+    scene.add(particleSystem);
+
+    function renderLoop() {
+      // Top 1% optimization: Pause GPU rendering when tab or hero is not visible
+      if (!state.isHeroVisible || !state.isTabVisible) {
+        animFrameId = requestAnimationFrame(renderLoop);
+        return;
+      }
+
+      if (particleSystem) {
+        particleSystem.rotation.y += 0.0003;
+        particleSystem.rotation.x += 0.00015;
+      }
+
+      renderer.render(scene, camera);
+      animFrameId = requestAnimationFrame(renderLoop);
+    }
+
+    renderLoop();
+
+    // Pause Three.js when hero is scrolled out of viewport
+    const heroSection = document.getElementById('hero');
+    if (heroSection) {
+      const heroObserver = new IntersectionObserver((entries) => {
+        state.isHeroVisible = entries[0].isIntersecting;
+      }, { threshold: 0.05 });
+      heroObserver.observe(heroSection);
+    }
+
+    // Handle Tab Visibility
+    document.addEventListener('visibilitychange', () => {
+      state.isTabVisible = !document.hidden;
+      if (state.isTabVisible && clock) clock.getDelta();
+    });
+
+    // Resize Handler
+    window.addEventListener('resize', () => {
+      if (!camera || !renderer) return;
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
-    }
-    if (renderer) {
       renderer.setSize(window.innerWidth, window.innerHeight);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    }
+    });
   }
 
-  window.addEventListener('resize', debounce(onWindowResize, 200));
-
-  // ==========================================================================
-  // 19. SCROLL HANDLER (combined)
-  // ==========================================================================
-
-  function onScroll() {
-    updateScrollProgress();
-  }
-
-  window.addEventListener('scroll', throttle(onScroll, 50), { passive: true });
-
-  // ==========================================================================
-  // 20. INITIALIZATION
-  // ==========================================================================
-
-  function initMainExperience() {
-    initThreeScene();
-    initScrollReveal();
-    initNavbar();
-    initSmoothScroll();
-    initCardTilt();
-    initSkillSpheres();
-    initCounters();
-    initMobileMenu();
-    initTypingEffect();
-    initCustomCursor();
-    initVisibilityHandler();
-    updateScrollProgress();
-  }
-
-  // Kick off the intro (or go straight to main experience if no overlay)
-  playCinematicIntro();
+  initThreeCanvas();
 });
